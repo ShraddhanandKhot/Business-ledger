@@ -1,33 +1,17 @@
+"use client";
+
 import Header from "@/components/Header";
 import TotalPendingCard from "@/components/TotalPendingCard";
 import SearchBar from "@/components/SearchBar";
 import CustomerCard from "@/components/CustomerCard";
 import FloatingButton from "@/components/FloatingButton";
-
-const customers = [
-  {
-    id: 1,
-    name: "Rahul Patil",
-    phone: "9876543210",
-    pending: 2500,
-  },
-  {
-    id: 2,
-    name: "Amit Kumar",
-    phone: "9123456789",
-    pending: 900,
-  },
-  {
-    id: 3,
-    name: "Suresh",
-    phone: "9988776655",
-    pending: 4200,
-  },
-];
+import { useCustomerStore } from "@/store/customerStore";
 
 export default function Home() {
+  const customers = useCustomerStore((state) => state.customers);
+
   const totalPending = customers.reduce(
-    (sum, customer) => sum + customer.pending,
+    (sum, customer) => sum + customer.openingBalance,
     0
   );
 

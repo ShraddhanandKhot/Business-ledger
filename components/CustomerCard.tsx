@@ -1,12 +1,11 @@
 import { ChevronRight } from "lucide-react";
 
 type Customer = {
-  id: number;
+  id: string;
   name: string;
   phone: string;
-  pending: number;
+  openingBalance: number;
 };
-
 export default function CustomerCard({
   customer,
 }: {
@@ -29,11 +28,11 @@ export default function CustomerCard({
         <div className="flex items-center gap-3">
           <div className="text-right">
             <p className="text-red-600 font-bold">
-              ₹ {customer.pending.toLocaleString("en-IN")}
+              ₹ {customer.openingBalance.toLocaleString("en-IN")}
             </p>
 
             <p className="text-xs text-gray-500">
-              Pending
+              Opening Balance
             </p>
           </div>
 
