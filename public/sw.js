@@ -1,5 +1,9 @@
-self.addEventListener("install", () => {
-  console.log("Service Worker Installed");
+self.addEventListener("install", (event) => {
+  self.skipWaiting();
 });
 
-self.addEventListener("fetch", () => {});
+self.addEventListener("activate", (event) => {
+  event.waitUntil(clients.claim());
+});
+
+// REMOVE the fetch listener completely.
