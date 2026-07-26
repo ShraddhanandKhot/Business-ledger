@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import PWARegister from "@/components/PWARegister";
+
 export const metadata: Metadata = {
   title: "Business Ledger",
   description: "Customer Ledger for Small Businesses",
@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body><PWARegister />
+      <body>
   {children}</body>
     </html>
   );
