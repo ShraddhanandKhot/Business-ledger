@@ -19,6 +19,7 @@ export default function RegisterSW() {
 
     const register = async () => {
       try {
+        // next-pwa generates `sw.js` in production (dest: 'public')
         const reg = await navigator.serviceWorker.register('/sw.js');
         // eslint-disable-next-line no-console
         console.log('Service worker registered:', reg);

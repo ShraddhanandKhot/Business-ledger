@@ -11,19 +11,40 @@
       <h1>PWA Launch Check</h1>
       <p id="status">Checking...</p>
       <p><a id="openApp" href="/">Open app</a></p>
+      <pre id="rootInfo" style="text-align:left;background:#061024;padding:10px;border-radius:6px;margin-top:12px;white-space:pre-wrap;word-break:break-word;max-height:240px;overflow:auto"></pre>
     </div>
     <script>
       const status = document.getElementById('status');
       const open = document.getElementById('openApp');
+      const rootInfo = document.getElementById('rootInfo');
       status.textContent = navigator.onLine ? 'Online' : 'Offline';
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistration().then(reg => {
           status.textContent += reg ? ' — Service worker registered' : ' — No service worker';
         }).catch(()=>{status.textContent += ' — SW check failed'});
       }
-      // Try to open root when online
+
+      // Diagnostic: try to fetch root and show response status and redirect info
+      async function checkRoot() {
+        try {
+          const resp = await fetch('/', { method: 'GET', credentials: 'include' });
+          const info = [];
+          info.push('Fetch / status: ' + resp.status + ' ' + resp.statusText);
+          info.push('Redirected: ' + resp.redirected + (resp.redirected ? (' -> ' + resp.url) : ''));
+          try {
+            const text = await resp.text();
+            info.push('\nResponse body (first 200 chars):\n' + text.slice(0, 200).replace(/</g,'&lt;'));
+          } catch (e) {
+            info.push('Failed to read response body: ' + e);
+          }
+          rootInfo.textContent = info.join('\n');
+        } catch (err) {
+          rootInfo.textContent = 'Fetch / failed: ' + err;
+        }
+      }
+
       if (navigator.onLine) {
-        // leave link as / to open full app
+        checkRoot();
       } else {
         open.href = '#';
         open.addEventListener('click', (e)=>{ e.preventDefault(); alert('Offline — cannot open full app'); });
