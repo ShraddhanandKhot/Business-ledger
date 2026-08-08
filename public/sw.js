@@ -41,11 +41,18 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          return response;
+          // If response is OK (2xx) or a valid redirect, return it.
+          if (response && response.status >= 200 && response.status < 400) {
+            return response;
+          }
+          // Non-OK (4xx/5xx) — try cached navigation route or offline page
+          console.warn('[sw] navigation fetch returned non-OK status', response.status, request.url);
+          return caches.match(request).then((cached) => cached || caches.match(OFFLINE_URL));
         })
-        .catch(() =>
-          caches.match(request).then((cached) => cached || caches.match(OFFLINE_URL))
-        )
+        .catch((err) => {
+          console.warn('[sw] navigation fetch failed, falling back to cache/offline', err, request.url);
+          return caches.match(request).then((cached) => cached || caches.match(OFFLINE_URL));
+        })
     );
     return;
   }
@@ -53,7 +60,15 @@ self.addEventListener('fetch', (event) => {
   // For other requests, try cache first then network, fallback to offline page
   event.respondWith(
     caches.match(request).then((cached) =>
-      cached || fetch(request).catch(() => caches.match(OFFLINE_URL))
+      cached || fetch(request).then((response) => {
+        if (response && response.status >= 200 && response.status < 400) return response;
+        // If non-OK response, fallback
+        console.warn('[sw] resource fetch returned non-OK', response.status, request.url);
+        return caches.match(OFFLINE_URL);
+      }).catch((err) => {
+        console.warn('[sw] resource fetch failed', err, request.url);
+        return caches.match(OFFLINE_URL);
+      })
     )
   );
 });
