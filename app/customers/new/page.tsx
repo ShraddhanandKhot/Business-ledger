@@ -14,15 +14,34 @@ export default function AddCustomerPage() {
   const [address, setAddress] = useState("");
   const [openingBalance, setOpeningBalance] = useState("");
 
-  const saveCustomer = () => {
+  const saveCustomer = async () => {
     if (!name.trim()) return;
 
+    const response = await fetch("/api/customers", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        phone,
+        address,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      alert(`Unable to add customer: ${error.message || error.error}`);
+      return;
+    }
+
+    const customer = await response.json();
     addCustomer({
-      id: crypto.randomUUID(),
-      name,
-      phone,
-      address,
-      openingBalance: Number(openingBalance || 0),
+      id: customer.id,
+      name: customer.name,
+      phone: customer.phone,
+      address: customer.address,
+      openingBalance: 0,
     });
 
     router.push("/");

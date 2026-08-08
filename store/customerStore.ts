@@ -3,25 +3,13 @@ import { Customer } from "@/types/customer";
 
 interface CustomerStore {
   customers: Customer[];
+  setCustomers: (customers: Customer[]) => void;
   addCustomer: (customer: Customer) => void;
 }
 
 export const useCustomerStore = create<CustomerStore>((set) => ({
-  customers: [
-    {
-      id: "1",
-      name: "Rahul Patil",
-      phone: "9876543210",
-      openingBalance: 2500,
-    },
-    {
-      id: "2",
-      name: "Amit Kumar",
-      phone: "9123456789",
-      openingBalance: 900,
-    },
-  ],
-
+  customers: [],
+  setCustomers: (customers) => set({ customers }),
   addCustomer: (customer) =>
     set((state) => ({
       customers: [...state.customers, customer],
