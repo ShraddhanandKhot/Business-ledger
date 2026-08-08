@@ -15,36 +15,44 @@ export default function AddCustomerPage() {
   const [openingBalance, setOpeningBalance] = useState("");
 
   const saveCustomer = async () => {
-    if (!name.trim()) return;
-
-    const response = await fetch("/api/customers", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name,
-        phone,
-        address,
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      alert(`Unable to add customer: ${error.message || error.error}`);
+    if (!name.trim()) {
+      alert("Customer name is required.");
       return;
     }
 
-    const customer = await response.json();
-    addCustomer({
-      id: customer.id,
-      name: customer.name,
-      phone: customer.phone,
-      address: customer.address,
-      openingBalance: 0,
-    });
+    try {
+      const response = await fetch("/api/customers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          phone,
+          address,
+        }),
+      });
 
-    router.push("/");
+      if (!response.ok) {
+        const error = await response.json();
+        alert(`Unable to add customer: ${error.message || error.error}`);
+        return;
+      }
+
+      const customer = await response.json();
+      addCustomer({
+        id: customer.id,
+        name: customer.name,
+        phone: customer.phone,
+        address: customer.address,
+        openingBalance: 0,
+      });
+
+      router.push("/");
+    } catch (err) {
+      alert("Unable to add customer. Please try again.");
+      console.error(err);
+    }
   };
 
   return (
@@ -86,6 +94,7 @@ export default function AddCustomerPage() {
         />
 
         <button
+          type="button"
           onClick={saveCustomer}
           className="w-full rounded-xl bg-blue-600 py-4 text-white font-semibold"
         >
