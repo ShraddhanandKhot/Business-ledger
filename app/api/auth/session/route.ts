@@ -8,9 +8,23 @@ if (!url || !anon) {
   throw new Error("Supabase env vars not set");
 }
 
-const supabase = createClient(url, anon);
+function createSupabaseServerClient(request: Request) {
+  return createClient(url, anon, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+    global: {
+      headers: {
+        cookie: request.headers.get("cookie") ?? "",
+      },
+    },
+  });
+}
 
-export async function GET() {
+export async function GET(request: Request) {
+  const supabase = createSupabaseServerClient(request);
   const { data, error } = await supabase.auth.getSession();
   if (error) {
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 });

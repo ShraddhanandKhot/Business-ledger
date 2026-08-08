@@ -8,9 +8,23 @@ if (!url || !anon) {
   throw new Error("Supabase env vars not set");
 }
 
-const supabase = createClient(url, anon);
+function createSupabaseServerClient(request: Request) {
+  return createClient(url, anon, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+    global: {
+      headers: {
+        cookie: request.headers.get("cookie") ?? "",
+      },
+    },
+  });
+}
 
 export async function POST(request: Request) {
+  const supabase = createSupabaseServerClient(request);
   const body = await request.json();
   const { name, phone, address } = body;
 
