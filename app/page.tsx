@@ -18,16 +18,18 @@ export default function Home() {
     setInstalled(isPWA());
   }, []);
 
-  if (!installed) {
-    return <InstallApp />;
-  }
-
+  // Always call hooks in the same order. `useCustomerStore` must run
+  // on every render, even if we show the install prompt first.
   const customers = useCustomerStore((state) => state.customers);
 
   const totalPending = customers.reduce(
     (sum, c) => sum + c.openingBalance,
     0
   );
+
+  if (!installed) {
+    return <InstallApp />;
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 pb-24">
