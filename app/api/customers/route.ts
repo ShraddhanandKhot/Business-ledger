@@ -9,6 +9,15 @@ if (!url || !anon) {
 }
 
 function createSupabaseServerClient(request: Request) {
+  const authorization = request.headers.get("authorization");
+  const headers: Record<string, string> = {
+    cookie: request.headers.get("cookie") ?? "",
+  };
+
+  if (authorization) {
+    headers.Authorization = authorization;
+  }
+
   return createClient(url!, anon!, {
     auth: {
       persistSession: false,
@@ -16,9 +25,7 @@ function createSupabaseServerClient(request: Request) {
       detectSessionInUrl: false,
     },
     global: {
-      headers: {
-        cookie: request.headers.get("cookie") ?? "",
-      },
+      headers,
     },
   });
 }

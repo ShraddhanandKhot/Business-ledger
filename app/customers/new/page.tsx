@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCustomerStore } from "@/store/customerStore";
+import { supabase } from "@/lib/supabase/client";
 
 export default function AddCustomerPage() {
   const router = useRouter();
@@ -21,11 +22,20 @@ export default function AddCustomerPage() {
     }
 
     try {
+      const session = await supabase.auth.getSession();
+      const accessToken = session?.data?.session?.access_token;
+
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+
+      if (accessToken) {
+        headers.Authorization = `Bearer ${accessToken}`;
+      }
+
       const response = await fetch("/api/customers", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         body: JSON.stringify({
           name,
           phone,
