@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>PWA Launch Check</title>
+    <style>body{font-family:system-ui,Segoe UI,Roboto,Arial;background:#0f172a;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0} .card{max-width:480px;padding:20px;text-align:center}</style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>PWA Launch Check</h1>
+      <p id="status">Checking...</p>
+      <p><a id="openApp" href="/">Open app</a></p>
+    </div>
+    <script>
+      const status = document.getElementById('status');
+      const open = document.getElementById('openApp');
+      status.textContent = navigator.onLine ? 'Online' : 'Offline';
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistration().then(reg => {
+          status.textContent += reg ? ' — Service worker registered' : ' — No service worker';
+        }).catch(()=>{status.textContent += ' — SW check failed'});
+      }
+      // Try to open root when online
+      if (navigator.onLine) {
+        // leave link as / to open full app
+      } else {
+        open.href = '#';
+        open.addEventListener('click', (e)=>{ e.preventDefault(); alert('Offline — cannot open full app'); });
+      }
+    </script>
+  </body>
+ </html>
