@@ -14,10 +14,15 @@ export default function SignupPage() {
     event.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    const { data, error } = await supabase.auth.signUp(
+      {
+        email,
+        password,
+      },
+      {
+        emailRedirectTo: `${window.location.origin}/auth/login`,
+      }
+    );
 
     setLoading(false);
 
@@ -26,6 +31,14 @@ export default function SignupPage() {
       return;
     }
 
+    if (data?.session) {
+      router.push("/");
+      return;
+    }
+
+    alert(
+      "Signup successful. Check your email for confirmation before logging in. If you do not receive a confirmation email, verify your Supabase SMTP/email settings."
+    );
     router.push("/auth/login");
   };
 

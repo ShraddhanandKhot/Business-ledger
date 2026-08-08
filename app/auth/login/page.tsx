@@ -14,7 +14,7 @@ export default function LoginPage() {
     event.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -22,7 +22,20 @@ export default function LoginPage() {
     setLoading(false);
 
     if (error) {
-      alert(error.message);
+      if (error.message.toLowerCase().includes("invalid login credentials")) {
+        alert(
+          "Invalid login credentials. Make sure the email/password are correct and that your account has been confirmed."
+        );
+      } else {
+        alert(error.message);
+      }
+      return;
+    }
+
+    if (!data.session) {
+      alert(
+        "Login succeeded but no session was created. If you signed up with email confirmation enabled, confirm your email first."
+      );
       return;
     }
 
