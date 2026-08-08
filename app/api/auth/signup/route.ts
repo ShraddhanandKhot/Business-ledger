@@ -10,7 +10,7 @@ if (!url || !anon) {
 }
 
 export async function POST(request: Request) {
-  const { email, password } = await request.json();
+  const { email, password, redirectTo } = await request.json();
   if (!email || !password) {
     return NextResponse.json(
       { ok: false, error: "Email and password are required." },
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   }
 
   if (serviceRole) {
-    const admin = createClient(url, serviceRole);
+    const admin = createClient(url!, serviceRole);
     const { data, error } = await admin.auth.admin.createUser({
       email,
       password,
@@ -33,11 +33,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, user: data.user });
   }
 
-  const supabase = createClient(url, anon);
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-  });
+  const supabase = createClient(url!, anon!);
+  const signUpOptions = redirectTo ? { emailRedirectTo: redirectTo } : undefined;
+  const { data, error } = await supabase.auth.signUp(
+    { email, password },
+    signUpOptions
+  );
 
   if (error) {
     return NextResponse.json({ ok: false, error: error.message }, { status: 400 });

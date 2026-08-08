@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -14,30 +13,35 @@ export default function SignupPage() {
     event.preventDefault();
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signUp(
-      {
+    const response = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
         email,
         password,
-      },
-      {
-        emailRedirectTo: `${window.location.origin}/auth/login`,
-      }
-    );
+        redirectTo: `${window.location.origin}/auth/login`,
+      }),
+    });
 
+    const result = await response.json();
     setLoading(false);
 
-    if (error) {
-      alert(error.message);
+    if (!response.ok) {
+      alert(result.error || "Signup failed.");
       return;
     }
 
-    if (data?.session) {
-      router.push("/");
+    if (result.user) {
+      alert("Signup successful. Please log in.");
+      router.push("/auth/login");
       return;
     }
 
     alert(
-      "Signup successful. Check your email for confirmation before logging in. If you do not receive a confirmation email, verify your Supabase SMTP/email settings."
+      "Signup successful. Check your email for confirmation, then log in. " +
+        "If you do not receive a confirmation email, configure Supabase SMTP settings."
     );
     router.push("/auth/login");
   };
