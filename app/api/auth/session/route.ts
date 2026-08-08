@@ -9,7 +9,7 @@ if (!url || !anon) {
 }
 
 function createSupabaseServerClient(request: Request) {
-  return createClient(url, anon, {
+  return createClient(url!, anon!, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
