@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import RegisterSW from "../components/RegisterSW";
 
 export const metadata: Metadata = {
   title: "Business Ledger",
@@ -25,7 +26,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-  {children}</body>
+        {children}
+        <RegisterSW />
+      </body>
     </html>
   );
 }
