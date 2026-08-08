@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { isPWA } from "@/lib/isPWA";
 import InstallApp from "@/components/InstallApp";
+import { supabase } from "@/lib/supabase/client";
 
 import Header from "@/components/Header";
 import TotalPendingCard from "@/components/TotalPendingCard";
@@ -12,11 +14,23 @@ import FloatingButton from "@/components/FloatingButton";
 import { useCustomerStore } from "@/store/customerStore";
 
 export default function Home() {
+  const router = useRouter();
   const [installed, setInstalled] = useState(false);
 
   useEffect(() => {
     setInstalled(isPWA());
   }, []);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const session = await supabase.auth.getSession();
+      if (!session?.data?.session) {
+        router.push("/auth/login");
+      }
+    };
+
+    checkSession();
+  }, [router]);
 
   // Always call hooks in the same order. `useCustomerStore` must run
   // on every render, even if we show the install prompt first.

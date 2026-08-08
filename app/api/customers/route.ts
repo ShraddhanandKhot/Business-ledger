@@ -40,12 +40,12 @@ export async function POST(request: Request) {
   }
 
   try {
-    const sessionRes = await supabase.auth.getSession();
-    if (sessionRes.error || !sessionRes.data.session) {
+    const userRes = await supabase.auth.getUser();
+    if (userRes.error || !userRes.data.user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    const userId = sessionRes.data.session.user.id;
+    const userId = userRes.data.user.id;
 
     const { data: businessData, error: businessError } = await supabase
       .from("businesses")

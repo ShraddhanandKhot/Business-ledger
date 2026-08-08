@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCustomerStore } from "@/store/customerStore";
 import { supabase } from "@/lib/supabase/client";
@@ -14,6 +14,17 @@ export default function AddCustomerPage() {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [openingBalance, setOpeningBalance] = useState("");
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const session = await supabase.auth.getSession();
+      if (!session?.data?.session) {
+        router.push("/auth/login");
+      }
+    };
+
+    checkSession();
+  }, [router]);
 
   const saveCustomer = async () => {
     if (!name.trim()) {
