@@ -34,9 +34,25 @@ export default function AddCustomerPage() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        alert(`Unable to add customer: ${error.message || error.error}`);
+        const contentType = response.headers.get("content-type") || "";
+        let errorMessage = "Unable to add customer.";
+
+        if (contentType.includes("application/json")) {
+          const error = await response.json();
+          errorMessage = error.message || error.error || errorMessage;
+        } else {
+          const text = await response.text();
+          errorMessage = text || errorMessage;
+        }
+
+        alert(`Unable to add customer: ${errorMessage}`);
         return;
+      }
+
+      const contentType = response.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        const text = await response.text();
+        throw new Error(`Expected JSON response but got: ${text}`);
       }
 
       const customer = await response.json();

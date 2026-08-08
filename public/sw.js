@@ -53,6 +53,16 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  if (request.method !== 'GET' || request.url.includes('/api/')) {
+    event.respondWith(
+      fetch(request).catch((err) => {
+        console.warn('[sw] API/non-GET fetch failed', err, request.url);
+        return caches.match(OFFLINE_URL);
+      })
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(request).then((cached) =>
       cached || fetch(request).then((response) => {
